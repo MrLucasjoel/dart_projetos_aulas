@@ -6,8 +6,8 @@ const String _dbHost = '127.0.0.1'; // localhost
 const int _dbPort = 3306;
 
 // diretivas do usuário e o nome do database (altere conforme a sua necessidade)
-const String _dbUser = 'marcio';
-const String _dbPassword = 'senha';
+const String _dbUser = 'lucas';
+const String _dbPassword = 'root';
 const String _dbDatabase = 'biblioteca';
 void main() async {
   // Inicializa a conexão com o banco de dados
@@ -53,6 +53,7 @@ Future<MySQLConnection?> _connectToDatabase() async {
       userName: _dbUser,
       databaseName: _dbDatabase,
       password: _dbPassword,
+      secure: false,
     );
     await conn.connect();
     return conn;
