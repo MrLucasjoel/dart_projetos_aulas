@@ -1,0 +1,188 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:flutter/services.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Gerar PDF Ambev',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const PdfScreen(),
+    );
+  }
+}
+
+class PdfScreen extends StatefulWidget {
+  const PdfScreen({super.key});
+  @override
+  State<PdfScreen> createState() => _PdfScreenState();
+}
+
+class _PdfScreenState extends State<PdfScreen> {
+  String? pdfPath;
+
+  Future<void> generatePdf() async {
+    final pdf = pw.Document();
+
+    final Map<String, List<String>> sections = {
+      "1. Informações Gerais sobre a Ambev": [
+        "A Ambev é uma das maiores empresas de bebidas do mundo, atuando principalmente na fabricação e distribuição de cervejas, refrigerantes, águas e sucos.",
+        "Presente em mais de 15 países das Américas, a companhia é conhecida por marcas como Skol, Brahma, Antarctica, entre outras.",
+        "Sua cultura organizacional enfatiza meritocracia, foco em resultados e ambiente competitivo, buscando inovação constante e sustentabilidade.",
+      ],
+      "2. Segurança da Informação": [
+        "A Ambev adota diversas práticas para proteger seus ativos digitais, incluindo o uso de antivírus atualizados, firewalls robustos, autenticação multifator (MFA) e criptografia de dados sensíveis.",
+        "Além disso, a empresa implementa políticas de controle de acesso baseadas em papéis (RBAC), garantindo que apenas usuários autorizados tenham acesso a informações críticas.",
+        "Um Sistema de Gestão de Segurança da Informação (SGSI) alinhado às normas ISO 27001 é mantido para assegurar conformidade e governança.",
+        "A empresa também mantém canais de denúncia para reportar incidentes e treina seus colaboradores sobre melhores práticas de segurança e a Lei Geral de Proteção de Dados (LGPD).",
+      ],
+      "3. Backup e Recuperação": [
+        "A política de backup da Ambev é formalizada e contempla a realização regular de backups completos e incrementais, garantindo a integridade e disponibilidade dos dados.",
+        "Os backups são armazenados em servidores internos e na nuvem, utilizando soluções modernas que permitem rápida recuperação em caso de falhas.",
+        "A empresa utiliza ferramentas líderes de mercado como a Veeam Data Platform, que proporcionou uma redução expressiva no tempo de recuperação de dados, de dias para minutos.",
+        "Essa estratégia de backup inclui monitoramento constante, testes periódicos e documentação detalhada para assegurar eficácia e aderência às normas internas.",
+      ],
+      "4. Incidentes e Plano de Recuperação": [
+        "Até o momento, não há registros públicos de perda significativa de dados que tenha impactado as operações da Ambev.",
+        "A organização mantém um plano de contingência e recuperação de desastres atualizado, que inclui simulações regulares para testar a prontidão das equipes e das tecnologias envolvidas.",
+        "Esse plano prevê procedimentos claros para rápida contenção, análise e restauração dos serviços em casos de incidentes.",
+        "As equipes são treinadas periodicamente para responder a emergências, utilizando ferramentas que automatizam processos e garantem a continuidade do negócio.",
+      ],
+      "5. Considerações Finais": [
+        "A Ambev demonstra maturidade em suas práticas de segurança e gestão de dados, alinhando tecnologia, processos e pessoas para minimizar riscos.",
+        "O investimento contínuo em inovação, cultura de segurança e governança fortalece sua posição no mercado e assegura confiança aos clientes e parceiros.",
+        "Recomenda-se a manutenção das auditorias internas e a atualização constante das políticas para acompanhar o cenário dinâmico das ameaças digitais.",
+      ],
+      "Fontes e Referências": [
+        "https://pt.wikipedia.org/wiki/Ambev",
+        "https://www.ambev.com.br/",
+        "https://www.ab-inbev.com/",
+        "https://securityleaders.com.br/ambev-desenvolve-data-recovery-baseado-em-linguagem-de-backup-unificada",
+        "https://altitecnologia.com/backup-corporativo-para-grandes-empresas",
+      ],
+    };
+
+    pdf.addPage(
+      pw.MultiPage(
+        margin: const pw.EdgeInsets.all(24),
+        build: (context) {
+          List<pw.Widget> content = [];
+
+          content.add(
+            pw.Header(
+              level: 0,
+              child: pw.Text(
+                'Relatório Completo: Segurança da Informação e Backup - Ambev',
+                style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+              ),
+            ),
+          );
+
+          sections.forEach((title, paragraphs) {
+            content.add(
+              pw.Header(
+                level: title == "Fontes e Referências" ? 1 : 2,
+                child: pw.Text(
+                  title,
+                  style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+                ),
+              ),
+            );
+
+            if (title == "Fontes e Referências") {
+              for (var fonte in paragraphs) {
+                content.add(pw.UrlLink(
+                  destination: fonte,
+                  child: pw.Text(fonte,
+                      style: const pw.TextStyle(
+                          color: PdfColors.blue,
+                          decoration: pw.TextDecoration.underline)),
+                ));
+                content.add(pw.SizedBox(height: 4));
+              }
+            } else {
+              content.add(
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: paragraphs
+                      .map((p) => pw.Padding(
+                            padding: const pw.EdgeInsets.only(bottom: 6),
+                            child: pw.Text(p,
+                                style:
+                                    const pw.TextStyle(fontSize: 12, height: 1.4)),
+                          ))
+                      .toList(),
+                ),
+              );
+            }
+
+            content.add(pw.SizedBox(height: 16));
+          });
+
+          return content;
+        },
+      ),
+    );
+
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/relatorio_ambev.pdf');
+    await file.writeAsBytes(await pdf.save());
+
+    setState(() {
+      pdfPath = file.path;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gerar PDF Ambev'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: generatePdf,
+              child: const Text('Gerar PDF'),
+            ),
+            const SizedBox(height: 20),
+            if (pdfPath != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    SelectableText(
+                      'PDF salvo em:\n$pdfPath',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        //Clipboard.setData(ClipboardData(text: pdfPath));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Caminho copiado para a área de transferência')),
+                        );
+                      },
+                      icon: const Icon(Icons.copy),
+                      label: const Text('Copiar caminho'),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
