@@ -1,8 +1,12 @@
 dependencies:
   mysql_client: ^0.0.27
-  shelf: ^1.4.0
+  shelf: ^1.4.1
   shelf_router: ^1.1.4
   shelf_io: ^1.0.0 
   shelf_static: ^1.1.1
   shelf_cors_headers: ^0.1.5
   shelf_logger: ^0.2.1
+
+  mysql_client: ^0.0.27 #mantido para acessar o mysql
+  shelf: ^1.4.1 #Framework HTTP para Dart
+  shelf_router: ^1.1.0 #Para roteamento das URL's
