@@ -10,3 +10,22 @@ dependencies:
   mysql_client: ^0.0.27 #mantido para acessar o mysql
   shelf: ^1.4.1 #Framework HTTP para Dart
   shelf_router: ^1.1.0 #Para roteamento das URL's
+
+
+  CREATE USER 'lucas'@'localhost' IDENTIFIED BY 'root';
+GRANT ALL PRIVILEGES ON banco_de_dados.* TO 'lucas'@'host';
+grant all privileges on *.* to 'lucas'@'localhost';
+SELECT user, host FROM mysql.user;
+SELECT * FROM mysql.user;
+SELECT USER();
+
+use biblioteca;
+
+create table livros(
+idlivro integer auto_increment,
+titulo varchar(48) not null,
+autor varchar(60) not null,
+primary key (idlivro)
+);
+
+dart cach revert
