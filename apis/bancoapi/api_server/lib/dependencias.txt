@@ -19,6 +19,9 @@ SELECT user, host FROM mysql.user;
 SELECT * FROM mysql.user;
 SELECT USER();
 
+ALTER USER 'nome_do_usuario'@'host' IDENTIFIED BY 'nova_senha';
+FLUSH PRIVILEGES;
+
 use biblioteca;
 
 create table livros(
@@ -28,4 +31,4 @@ autor varchar(60) not null,
 primary key (idlivro)
 );
 
-dart cach revert
+dart pub cache repair
